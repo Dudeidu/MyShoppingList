@@ -37,14 +37,6 @@ class ItemTouchHelperCallback(
         Log.d("ItemTouchHelper", "Item at position ${viewHolder.adapterPosition} swiped")
         adapter.onItemSwiped(viewHolder.adapterPosition)
     }
-    /*
-    override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {
-        super.onSelectedChanged(viewHolder, actionState)
-        if (actionState == ItemTouchHelper.ACTION_STATE_DRAG) {
-            TODO()
-        }
-    }
-     */
 }
 
 interface ItemTouchHelperAdapter {
