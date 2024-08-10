@@ -3,4 +3,5 @@
     <string name="app_name">רשימת הקניות שלי</string>
     <string name="undo">ביטול</string>
     <string name="item_deleted">פריט נמחק</string>
+    <string name="add_item">פריט חדש</string>
 </resources>

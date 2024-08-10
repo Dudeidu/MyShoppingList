@@ -6,4 +6,6 @@ class Item (
     var amount: Int = 0,
     var amountType: String = "",
     var iconResource: Int = R.drawable.icon_apple) {
+
+    var namePrev: String = name
 }

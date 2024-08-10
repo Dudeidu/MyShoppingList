@@ -281,9 +281,13 @@ class IconSearcher {
         Icon("zucchini", listOf("zucchini", "זוקיני", "קישוא", "קישואים"), R.drawable.icon_zucchini),
     )
     private val scoreThreshold = 70
+    private val baseWordSet: MutableSet<String> = mutableSetOf()
+    private val customWordsSet: MutableSet<String> = mutableSetOf()
+    val totalWordsSet: MutableSet<String> = mutableSetOf()
 
     fun makeWordList() : List<String> {
         val wordSet: MutableSet<String> = mutableSetOf()
+
         for (icon: Icon in icons) {
             wordSet.addAll(icon.tags)
         }
@@ -297,10 +301,20 @@ class IconSearcher {
         }.toSet()
 
         // Clear the original set and add all updated words
-        wordSet.clear()
-        wordSet.addAll(updatedSet)
+        baseWordSet.clear()
+        baseWordSet.addAll(updatedSet)
 
-        return wordSet.sorted()
+        return baseWordSet.sorted()
+    }
+
+    fun updateAutofillWords(itemList: MutableList<Item>) {
+        customWordsSet.clear()
+        for (item: Item in itemList) {
+            customWordsSet.add(item.name)
+        }
+        totalWordsSet.clear()
+        totalWordsSet.addAll(customWordsSet)
+        totalWordsSet.addAll(baseWordSet)
     }
 
     // Function to calculate relevance score
@@ -350,14 +364,12 @@ class IconSearcher {
         for (item in icons) {
             val score = calculateRelevanceScore(query, item.tags)
             if (score == 100) {
-                Log.d("ITEM", score.toString())
                 return item.resource
             } else if (score > scoreThreshold && score > highestScore) {
                 highestScore = score
                 bestMatch = item.resource
             }
         }
-        Log.d("ITEM", highestScore.toString())
         return bestMatch
     }
 }
