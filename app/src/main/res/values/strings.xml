@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">My Shopping List</string>
+    <string name="undo">Undo</string>
+    <string name="item_deleted">Item deleted</string>
+</resources>

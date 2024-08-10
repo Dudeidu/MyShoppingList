@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">רשימת הקניות שלי</string>
+    <string name="undo">ביטול</string>
+    <string name="item_deleted">פריט נמחק</string>
+</resources>
