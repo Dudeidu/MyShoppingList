@@ -4,4 +4,18 @@
     <string name="undo">ביטול</string>
     <string name="item_deleted">פריט נמחק</string>
     <string name="add_item">פריט חדש</string>
+
+    <string-array name="amount_types">
+        <item>יח\'</item>
+        <item>גרם</item>
+        <item>ק"ג</item>
+        <item>ליטר</item>
+        <item>מ"ל</item>
+        <item>מארזים</item>
+        <item>ארגזים</item>
+    </string-array>
+    <string name="save">שמירה</string>
+    <string name="cancel">ביטול</string>
+    <string name="enter_amount">כמות</string>
+    <string name="type_default">גרם</string>
 </resources>

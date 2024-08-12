@@ -3,4 +3,20 @@
     <string name="undo">Undo</string>
     <string name="item_deleted">Item deleted</string>
     <string name="add_item">Add Item</string>
+
+    <string-array name="amount_types">
+        <item>units</item>
+        <item>g</item>
+        <item>Kg</item>
+        <item>l</item>
+        <item>ml</item>
+        <item>packs</item>
+        <item>cases</item>
+    </string-array>
+    <string name="save">Save</string>
+    <string name="cancel">Cancel</string>
+    <string name="enter_amount">Enter Amount</string>
+    <string name="type_default">Units</string>
+    <string name="amount_default" translatable="false">1</string>
+
 </resources>

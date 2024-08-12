@@ -22,7 +22,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:text="200"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        android:text="@string/amount_default"
         android:textAlignment="viewEnd"
         android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -35,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="12dp"
-        android:text="g"
+        android:text="@string/type_default"
         android:textAlignment="viewEnd"
         android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -59,7 +63,7 @@
 
         <ImageView
             android:id="@+id/imgHandle"
-            android:layout_width="19dp"
+            android:layout_width="27dp"
             android:layout_height="match_parent"
             app:srcCompat="@drawable/ic_drag_handle" />
 

@@ -30,6 +30,7 @@ class MainActivity : AppCompatActivity(), StartDragListener {
     private var iconSearcher: IconSearcher = IconSearcher()
 
     private lateinit var viewModel: ItemViewModel
+    private lateinit var itemRepository: ItemRepository
     private lateinit var recyclerAdapter: RecyclerAdapter
     private var fabAddItem: FloatingActionButton? = null
 
@@ -43,7 +44,8 @@ class MainActivity : AppCompatActivity(), StartDragListener {
             insets
         }
 
-        viewModel = ViewModelProvider(this).get(ItemViewModel::class.java)
+        itemRepository = ItemRepository(this)
+        viewModel = ViewModelProvider(this, ViewModelFactory(itemRepository))[ItemViewModel::class.java]
 
         recyclerView = findViewById(R.id.recyclerView)
 
@@ -51,6 +53,10 @@ class MainActivity : AppCompatActivity(), StartDragListener {
         fabAddItem?.setOnClickListener { view ->
             viewModel.addItem("")
 
+            recyclerView?.post {
+                // Scroll the RecyclerView to the top
+                recyclerView?.scrollToPosition(0)
+            }
             // Post a runnable to request focus and show the keyboard
             recyclerView?.post {
                 // Get the ViewHolder at that position

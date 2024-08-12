@@ -1,11 +1,19 @@
 package com.example.shoppinglist
 
-class Item (
+import android.content.Context
+
+import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
+
+@kotlinx.serialization.Serializable
+data class Item (
     var name: String,
     var done: Boolean = false,
-    var amount: Int = 0,
+    var amount: Float = 1.0f,
     var amountType: String = "",
     var iconResource: Int = R.drawable.icon_apple) {
 
-    var namePrev: String = name
+        @kotlinx.serialization.Transient
+        var namePrev: String = name
 }
+

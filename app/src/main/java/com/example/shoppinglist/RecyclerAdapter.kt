@@ -3,6 +3,8 @@ package com.example.shoppinglist
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Paint
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
@@ -12,14 +14,20 @@ import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
+import android.widget.Button
 import android.widget.CheckBox
+import android.widget.EditText
 import android.widget.ImageView
+import android.widget.Spinner
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import java.text.DecimalFormat
 
 
 class RecyclerAdapter(
@@ -72,8 +80,8 @@ class RecyclerAdapter(
         // Set the adapter to the AutoCompleteTextView
         holder.actvName.setAdapter(arrayAdapter)
         // handle item selection
-        holder.actvName.setOnItemClickListener { parent, v, position, id ->
-            val text = parent.getItemAtPosition(position).toString()
+        holder.actvName.setOnItemClickListener { parent, v, clickPosition, id ->
+            val text = parent.getItemAtPosition(clickPosition).toString()
             onNameChanged(holder, item, position, text)
         }
         // handle key press
@@ -119,9 +127,51 @@ class RecyclerAdapter(
             item.done = isChecked
         }
 
+        // amount edit dialog
+        holder.tvAmount.setOnClickListener {
+            showAmountDialog(context, item) { amount, type ->
+                // Create a DecimalFormat instance
+                val decimalFormat = DecimalFormat("#.##")
+                // Format the amount to ensure no trailing decimal places if it's a whole number
+                val formattedAmount = decimalFormat.format(amount)
+
+                holder.tvAmount.text = formattedAmount
+                holder.tvAmountType.text = type
+
+                item.amount = amount
+                item.amountType = type
+
+                // Update the UI or ViewModel as needed
+                viewModel.changeItem(position, null, item.amount, item.amountType)
+            }
+        }
+        holder.tvAmountType.setOnClickListener {
+            showAmountDialog(context, item) { amount, type ->
+                // Create a DecimalFormat instance
+                val decimalFormat = DecimalFormat("#.##")
+                // Format the amount to ensure no trailing decimal places if it's a whole number
+                val formattedAmount = decimalFormat.format(amount)
+
+                holder.tvAmount.text = formattedAmount
+                holder.tvAmountType.text = type
+
+                item.amount = amount
+                item.amountType = type
+
+                // Update the UI or ViewModel as needed
+                viewModel.changeItem(position, null, item.amount, item.amountType)
+            }
+        }
+
         holder.cbDone.isChecked = item.done
         holder.actvName.setText(item.name)
-        holder.tvAmount.text = if (item.amount == 0) "" else item.amount.toString()
+
+        // Create a DecimalFormat instance
+        val decimalFormat = DecimalFormat("#.##")
+        // Format the amount to ensure no trailing decimal places if it's a whole number
+        val formattedAmount = decimalFormat.format(item.amount)
+        holder.tvAmount.text = if (item.amount <= 0) "" else formattedAmount
+
         holder.tvAmountType.text = item.amountType
         holder.imgIcon.setImageResource(item.iconResource)
 
@@ -209,5 +259,87 @@ class RecyclerAdapter(
         notifyDataSetChanged()
 
         originalItemList = newList
+    }
+
+    private fun showAmountDialog(context: Context, item: Item, onSave: (Float, String) -> Unit) {
+        // Inflate the dialog layout
+        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_amount_type, null)
+
+        // Set up the dialog
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+
+        // Find the views in the dialog
+        val etAmount = dialogView.findViewById<EditText>(R.id.etAmount)
+        val dlType = dialogView.findViewById<Spinner>(R.id.dlType)
+        val bSave = dialogView.findViewById<Button>(R.id.bSave)
+        val bCancel = dialogView.findViewById<Button>(R.id.bCancel)
+
+        // Populate dialog values with amount and type
+
+        // Create a DecimalFormat instance
+        val decimalFormat = DecimalFormat("#.##")
+        // Format the amount to ensure no trailing decimal places if it's a whole number
+        val formattedAmount = decimalFormat.format(item.amount)
+
+        etAmount.setText(formattedAmount.toString())
+
+        val type = item.amountType
+        // Select drop list position depending on type
+        val adapter = dlType.adapter
+        if (adapter is ArrayAdapter<*>) {
+            @Suppress("UNCHECKED_CAST")
+            val spinnerPos = (adapter as ArrayAdapter<String>).getPosition(type)
+            if (spinnerPos != -1) {
+                dlType.setSelection(spinnerPos)
+            } else {
+                Log.e("Spinner", "Value not found: $type")
+            }
+        }
+
+        // Show the dialog
+        dialog.setOnShowListener {
+            etAmount.requestFocus()
+            etAmount.postDelayed({
+                val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                imm.showSoftInput(etAmount, InputMethodManager.SHOW_IMPLICIT)
+                etAmount.setSelection(0, etAmount.text.length)
+            }, 200) // Adjust delay as necessary
+        }
+
+        dialog.setOnDismissListener {
+            // Get the RecyclerView's layout manager
+            val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+            layoutManager?.let {
+                // Iterate over visible items
+                for (i in 0 until it.childCount) {
+                    val view = it.getChildAt(i)
+                    val actv = view?.findViewById<AutoCompleteTextView>(R.id.actvItemName)
+                    actv?.clearFocus()
+                }
+            }
+
+            // Hide the keyboard if it's open
+            val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(dialog.window?.decorView?.windowToken, 0)
+        }
+
+        // Handle the save button click
+        bSave.setOnClickListener {
+            val amount = etAmount.text.toString().toFloatOrNull() ?: 0f
+            val selectedType = dlType.selectedItem.toString()
+
+            onSave(amount, selectedType)
+
+            dialog.dismiss()
+        }
+
+        bCancel.setOnClickListener {
+            dialog.cancel()
+        }
+
+        // Show the dialog
+        dialog.show()
     }
 }

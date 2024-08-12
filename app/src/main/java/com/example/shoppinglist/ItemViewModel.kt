@@ -1,21 +1,51 @@
 package com.example.shoppinglist
 
 import android.R.attr.data
+import android.content.Context
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.CreationExtras
 import java.util.Collections
 
 
-class ItemViewModel : ViewModel() {
+class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     private val _itemList = MutableLiveData<MutableList<Item>>().apply { value = mutableListOf() }
     val itemList: LiveData<MutableList<Item>> = _itemList
+
+    init {
+        // Load items when the ViewModel is created
+        _itemList.value = repository.loadItems()
+    }
 
     fun updateItems() {
         val list = _itemList.value?.toMutableList() ?: return
         _itemList.value = list
+
+        repository.saveItems(list)
     }
+
+    fun changeItem(
+        position: Int,
+        name: String? = null,
+        amount: Float? = null,
+        amountType: String? = null) {
+
+        val list = _itemList.value?.toMutableList() ?: return
+        val item = list[position]
+
+        if (name != null) item.name = name
+        if (amount != null) item.amount = amount
+        if (amountType != null) item.amountType = amountType
+
+        // Update the LiveData with the new list
+        _itemList.value = list
+
+        repository.saveItems(list)
+    }
+
     fun moveItem(fromPosition: Int, toPosition: Int) {
         val list = _itemList.value?.toMutableList() ?: return
 
@@ -32,10 +62,13 @@ class ItemViewModel : ViewModel() {
 
             // Update the LiveData with the new list
             _itemList.value = list
+
+            repository.saveItems(list)
         } else {
             Log.e("ItemViewModel", "Invalid positions for moveItem: fromPosition=$fromPosition, toPosition=$toPosition")
         }
     }
+
     fun replaceItem(oldPosition: Int, newPosition: Int) {
         val list = _itemList.value?.toMutableList() ?: return
 
@@ -59,6 +92,8 @@ class ItemViewModel : ViewModel() {
 
             // Update LiveData with the new list
             _itemList.value = list
+
+            repository.saveItems(list)
         } else {
             Log.e("RecyclerAdapter", "Invalid positions for replacement: oldPosition=$oldPosition, newPosition=$newPosition")
         }
@@ -87,11 +122,15 @@ class ItemViewModel : ViewModel() {
             list.add(item)
         }
         _itemList.value = list
+
+        repository.saveItems(list)
     }
 
     fun removeItem(item: Item) {
         val list = _itemList.value ?: mutableListOf()
         list.remove(item)
         _itemList.value = list
+
+        repository.saveItems(list)
     }
 }

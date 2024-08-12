@@ -1,7 +1,9 @@
 package com.example.shoppinglist
 
 import android.util.Log
+import android.widget.AutoCompleteTextView
 import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.recyclerview.widget.RecyclerView.ViewHolder
 
@@ -58,6 +60,16 @@ class ItemTouchHelperCallback(
                 fromPosition = RecyclerView.NO_POSITION
                 toPosition = RecyclerView.NO_POSITION
                 dragStartPosition = RecyclerView.NO_POSITION
+            }
+
+            // Clear focus from AutoCompleteTextView widgets and hide keyboard
+            val layoutManager = recyclerView.layoutManager as? LinearLayoutManager
+            layoutManager?.let {
+                for (i in 0 until it.childCount) {
+                    val view = it.getChildAt(i)
+                    val actv = view?.findViewById<AutoCompleteTextView>(R.id.actvItemName)
+                    actv?.clearFocus()
+                }
             }
         }
     }

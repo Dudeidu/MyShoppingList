@@ -1,6 +1,8 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+
+    kotlin("plugin.serialization") // Ensure this line is present
 }
 
 android {
@@ -37,7 +39,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
 }
+
 
 dependencies {
 
@@ -51,4 +55,6 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     // desugaring to enable higher API stuff
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
+    implementation(libs.kotlinx.serialization.json)
 }
