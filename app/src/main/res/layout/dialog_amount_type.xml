@@ -14,9 +14,11 @@
 
         <EditText
             android:id="@+id/etAmount"
-            android:layout_width="162dp"
+            android:layout_width="130dp"
             android:layout_height="56dp"
             android:autofillHints=""
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:hint="@string/enter_amount"
             android:inputType="number|numberDecimal|numberSigned"
             android:textColorHint="#546E7A"
@@ -24,13 +26,11 @@
             app:layout_constraintEnd_toStartOf="@+id/dlType"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:focusable="true"
-            android:focusableInTouchMode="true"/>
+            app:layout_constraintTop_toTopOf="parent" />
 
         <Spinner
             android:id="@+id/dlType"
-            android:layout_width="111dp"
+            android:layout_width="130dp"
             android:layout_height="56dp"
             android:entries="@array/amount_types"
             app:layout_constraintBottom_toBottomOf="parent"
@@ -52,6 +52,7 @@
             android:layout_height="50dp"
             android:layout_marginStart="32dp"
             android:text="@string/save"
+            android:textSize="16sp"
             app:layout_constraintBaseline_toBaselineOf="@+id/bCancel"
             app:layout_constraintStart_toStartOf="parent" />
 
@@ -61,6 +62,7 @@
             android:layout_height="50dp"
             android:layout_marginEnd="32dp"
             android:text="@string/cancel"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"

@@ -31,7 +31,9 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
         position: Int,
         name: String? = null,
         amount: Float? = null,
-        amountType: String? = null) {
+        amountType: String? = null,
+        checked: Boolean? = null,
+        icon: Int? = null) {
 
         val list = _itemList.value?.toMutableList() ?: return
         val item = list[position]
@@ -39,6 +41,8 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
         if (name != null) item.name = name
         if (amount != null) item.amount = amount
         if (amountType != null) item.amountType = amountType
+        if (checked != null) item.done = checked
+        if (icon != null) item.iconResource = icon
 
         // Update the LiveData with the new list
         _itemList.value = list
@@ -47,26 +51,32 @@ class ItemViewModel(private val repository: ItemRepository) : ViewModel() {
     }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
-        val list = _itemList.value?.toMutableList() ?: return
-
-        if (fromPosition in list.indices && toPosition in list.indices) {
-            if (fromPosition < toPosition) {
-                for (i in fromPosition until toPosition) {
-                    Collections.swap(list, i, i + 1)
-                }
-            } else {
-                for (i in fromPosition downTo toPosition + 1) {
-                    Collections.swap(list, i, i - 1)
-                }
-            }
-
-            // Update the LiveData with the new list
-            _itemList.value = list
-
-            repository.saveItems(list)
-        } else {
+        Log.e("ITEM", "move from: $fromPosition to $toPosition")
+        val currentList = _itemList.value ?: return
+        if (fromPosition !in currentList.indices || toPosition !in currentList.indices) {
             Log.e("ItemViewModel", "Invalid positions for moveItem: fromPosition=$fromPosition, toPosition=$toPosition")
+            return
         }
+
+        // Create a mutable copy of the current list
+        val list = currentList.toMutableList()
+
+        // Move item within the list
+        if (fromPosition < toPosition) {
+            for (i in fromPosition until toPosition) {
+                Collections.swap(list, i, i + 1)
+            }
+        } else {
+            for (i in fromPosition downTo toPosition + 1) {
+                Collections.swap(list, i, i - 1)
+            }
+        }
+
+        // Update LiveData with the new list
+        _itemList.value = list
+
+        // Save the updated list to the repository
+        repository.saveItems(list)
     }
 
     fun replaceItem(oldPosition: Int, newPosition: Int) {

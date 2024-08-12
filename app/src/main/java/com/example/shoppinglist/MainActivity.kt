@@ -2,7 +2,11 @@ package com.example.shoppinglist
 
 import android.content.Context
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.text.InputType
 import android.view.View
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -57,22 +61,30 @@ class MainActivity : AppCompatActivity(), StartDragListener {
                 // Scroll the RecyclerView to the top
                 recyclerView?.scrollToPosition(0)
             }
-            // Post a runnable to request focus and show the keyboard
-            recyclerView?.post {
-                // Get the ViewHolder at that position
-                val viewHolder = recyclerView?.findViewHolderForAdapterPosition(0)
+            fabAddItem = findViewById(R.id.fabAddItem)
+            fabAddItem?.setOnClickListener { view ->
+                viewModel.addItem("")
 
-                // If the ViewHolder is found and not null
-                if (viewHolder != null) {
-                    // Assuming your ViewHolder has an EditText field, get the EditText reference
-                    val actv = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.actvItemName)
+                recyclerView?.post {
+                    // Scroll the RecyclerView to the top
+                    recyclerView?.scrollToPosition(0)
 
-                    // Request focus on the EditText
-                    actv.requestFocus()
+                    // Use a Handler to delay the focus request
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        // Get the ViewHolder at that position
+                        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(0)
 
-                    // Show the keyboard
-                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                    imm.showSoftInput(actv, InputMethodManager.SHOW_IMPLICIT)
+                        // If the ViewHolder is found and not null
+                        if (viewHolder != null) {
+                            // Assuming your ViewHolder has an EditText field, get the EditText reference
+                            val actv = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.actvItemName)
+                            // Request focus on the EditText
+                            actv.requestFocus()
+                            // Show the keyboard
+                            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                            imm.showSoftInput(actv, InputMethodManager.SHOW_IMPLICIT)
+                        }
+                    }, 300) // Adjust the delay as needed
                 }
             }
 
@@ -83,7 +95,7 @@ class MainActivity : AppCompatActivity(), StartDragListener {
 
         // Observe the item list from ViewModel
         viewModel.itemList.observe(this, Observer { itemList ->
-            recyclerAdapter.submitList(itemList)
+            recyclerAdapter.safeSubmitList(itemList)
         })
 
 

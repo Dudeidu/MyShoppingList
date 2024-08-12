@@ -55,8 +55,8 @@ class ItemTouchHelperCallback(
             if (dragStartPosition != RecyclerView.NO_POSITION && toPosition != RecyclerView.NO_POSITION) {
                 //adapter.onItemMove(fromPosition, toPosition)
                 // update the viewmodel
-                (adapter as RecyclerAdapter).viewModel.moveItem(dragStartPosition, toPosition)
-                adapter.notifyDataSetChanged()
+                //(adapter as RecyclerAdapter).viewModel.moveItem(dragStartPosition, toPosition)
+                //adapter.notifyDataSetChanged()
                 fromPosition = RecyclerView.NO_POSITION
                 toPosition = RecyclerView.NO_POSITION
                 dragStartPosition = RecyclerView.NO_POSITION

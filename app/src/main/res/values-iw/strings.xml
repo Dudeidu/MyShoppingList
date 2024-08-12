@@ -17,5 +17,6 @@
     <string name="save">שמירה</string>
     <string name="cancel">ביטול</string>
     <string name="enter_amount">כמות</string>
-    <string name="type_default">גרם</string>
+    <string name="type_default">יח\'</string>
+    <string name="icon_description">תמונת הפריט</string>
 </resources>

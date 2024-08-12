@@ -11,6 +11,7 @@ import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
@@ -23,6 +24,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.content.ContextCompat.getSystemService
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -40,6 +42,7 @@ class RecyclerAdapter(
 ) : RecyclerView.Adapter<RecyclerAdapter.MyViewHolder>(), ItemTouchHelperAdapter {
 
     private var originalItemList: List<Item> = itemList.toList()
+    private var isUpdating = false
 
     // Create the ArrayAdapter with custom dropdown item layout
     private val arrayAdapter: ArrayAdapter<String> by lazy {
@@ -77,6 +80,9 @@ class RecyclerAdapter(
         //val itemSuggestions = inputStream.bufferedReader().use { it.readText() }.split("\n").toTypedArray()
         val itemSuggestions = iconSearcher.makeWordList()
 
+        holder.actvName.setHorizontallyScrolling(false);
+        holder.actvName.setMaxLines(3);
+
         // Set the adapter to the AutoCompleteTextView
         holder.actvName.setAdapter(arrayAdapter)
         // handle item selection
@@ -85,8 +91,10 @@ class RecyclerAdapter(
             onNameChanged(holder, item, position, text)
         }
         // handle key press
-        holder.actvName.setOnKeyListener { v, keyCode, event ->
-            if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
+        holder.actvName.setOnEditorActionListener { v, actionId, event ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+        //holder.actvName.setOnKeyListener { v, keyCode, event ->
+                //   if (keyCode == KeyEvent.KEYCODE_ENTER && event.action == KeyEvent.ACTION_DOWN) {
                 // Code to execute when Enter key is pressed
 
                 val text = holder.actvName.text.toString()
@@ -125,6 +133,7 @@ class RecyclerAdapter(
                 }
             }
             item.done = isChecked
+            viewModel.changeItem(position, checked = isChecked)
         }
 
         // amount edit dialog
@@ -175,10 +184,12 @@ class RecyclerAdapter(
         holder.tvAmountType.text = item.amountType
         holder.imgIcon.setImageResource(item.iconResource)
 
+
         // Set touch listener for handle view
         holder.handle.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_DOWN) {
                 startDragListener.requestDrag(holder)
+                return@setOnTouchListener true
             }
             false
         }
@@ -192,8 +203,8 @@ class RecyclerAdapter(
     override fun onItemMove(fromPosition: Int, toPosition: Int): Boolean {
         if (fromPosition != toPosition) {
             Log.d("ITEM", "DRAGGING")
-            //viewModel.moveItem(fromPosition, toPosition)
-            notifyItemMoved(fromPosition, toPosition)
+            viewModel.moveItem(fromPosition, toPosition)
+            //notifyItemMoved(fromPosition, toPosition)
             return true
         }
         return false
@@ -206,7 +217,7 @@ class RecyclerAdapter(
 
         // Remove the item from the data source
         viewModel.removeItem(removedItem)
-        notifyItemRemoved(position)
+        //notifyItemRemoved(position)
 
         // Show the Snackbar with an undo option
         Snackbar.make(recyclerView, R.string.item_deleted, Snackbar.LENGTH_LONG)
@@ -216,7 +227,7 @@ class RecyclerAdapter(
 
                 viewModel.addItem(removedItem.name, validPosition)
                 //itemList.add(validPosition, removedItem)
-                notifyItemInserted(validPosition)
+                //notifyItemInserted(validPosition)
             }
             .show()
     }
@@ -232,7 +243,7 @@ class RecyclerAdapter(
         item.namePrev = item.name
 
         // Find an existing item with the same name (but not the current item)
-        val existingItemIndex = itemList.indexOfFirst { it.name == text && it != item }
+        val existingItemIndex = itemList.indexOfFirst { it.name == text && it !== item }
 
         if (existingItemIndex != -1) {
             // Handle replacement in a way that avoids index issues
@@ -241,6 +252,8 @@ class RecyclerAdapter(
             // Update suggestions if no replacement needed
             iconSearcher.updateAutofillWords(itemList)
             updateSuggestions(iconSearcher.totalWordsSet.toList())
+
+            viewModel.changeItem(position, name = item.name, icon = item.iconResource)
         }
     }
 
@@ -253,12 +266,26 @@ class RecyclerAdapter(
     }
 
     fun submitList(newList: List<Item>) {
+        val diffCallback = ItemDiffCallback(itemList, newList)
+        val diffResult = DiffUtil.calculateDiff(diffCallback)
+
         itemList.clear()
         itemList.addAll(newList)
 
-        notifyDataSetChanged()
+        // Apply the changes
+        diffResult.dispatchUpdatesTo(this)
 
+        // Update the original list reference
         originalItemList = newList
+    }
+
+    fun safeSubmitList(newList: List<Item>) {
+        if (isUpdating) return
+        isUpdating = true
+        recyclerView.post {
+            submitList(newList)
+            isUpdating = false
+        }
     }
 
     private fun showAmountDialog(context: Context, item: Item, onSave: (Float, String) -> Unit) {

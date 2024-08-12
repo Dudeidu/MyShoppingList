@@ -18,5 +18,6 @@
     <string name="enter_amount">Enter Amount</string>
     <string name="type_default">Units</string>
     <string name="amount_default" translatable="false">1</string>
+    <string name="icon_description">Item image</string>
 
 </resources>
