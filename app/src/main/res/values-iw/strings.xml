@@ -8,9 +8,9 @@
     <string-array name="amount_types">
         <item>יח\'</item>
         <item>גרם</item>
-        <item>ק"ג</item>
+        <item>ק\"ג</item>
         <item>ליטר</item>
-        <item>מ"ל</item>
+        <item>מ\"ל</item>
         <item>מארזים</item>
         <item>ארגזים</item>
     </string-array>

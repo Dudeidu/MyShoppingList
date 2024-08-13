@@ -43,15 +43,27 @@ class RecyclerAdapter(
 
     private var originalItemList: List<Item> = itemList.toList()
     private var isUpdating = false
+    private var isListLoaded = false
 
     // Create the ArrayAdapter with custom dropdown item layout
+    /*
     private val arrayAdapter: ArrayAdapter<String> by lazy {
         ArrayAdapter(
             context,
             android.R.layout.simple_dropdown_item_1line,
             iconSearcher.makeWordList()
         )
-    }
+    }*/
+
+    // Create the adapter with custom filter
+    private val arrayAdapter = CustomArrayAdapter(
+        context,
+        android.R.layout.simple_dropdown_item_1line,
+        iconSearcher.makeWordList()
+    )
+
+
+
 
     inner class MyViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         var cbDone: CheckBox = view.findViewById(R.id.cbDone)
@@ -68,6 +80,14 @@ class RecyclerAdapter(
         val itemView: View = LayoutInflater.from(parent.context).inflate(
             R.layout.list_items, parent, false)
 
+        // load list with custom items
+        if (!isListLoaded) {
+            iconSearcher.updateAutofillWords(itemList)
+            updateSuggestions(iconSearcher.totalWordsSet.toList())
+
+            isListLoaded = true
+        }
+
         return MyViewHolder(itemView)
     }
 
@@ -78,7 +98,7 @@ class RecyclerAdapter(
         // Read item suggestion text file from res/raw
         //val inputStream = context.resources.openRawResource(R.raw.item_suggestions)
         //val itemSuggestions = inputStream.bufferedReader().use { it.readText() }.split("\n").toTypedArray()
-        val itemSuggestions = iconSearcher.makeWordList()
+        //val itemSuggestions = iconSearcher.makeWordList()
 
         holder.actvName.setHorizontallyScrolling(false);
         holder.actvName.setMaxLines(3);
@@ -259,10 +279,10 @@ class RecyclerAdapter(
 
     // Method to update the suggestions data from outside
     fun updateSuggestions(newSuggestions: List<String>) {
-        arrayAdapter.clear()
-        arrayAdapter.addAll(newSuggestions)
+        arrayAdapter.tempItems.clear()
+        arrayAdapter.tempItems.addAll(newSuggestions)
         arrayAdapter.notifyDataSetChanged()
-        Log.d("ITEM", "suggestion list updated.")
+        //Log.d("ITEM", "updateSuggestions: ${arrayAdapter.items.size}")
     }
 
     fun submitList(newList: List<Item>) {

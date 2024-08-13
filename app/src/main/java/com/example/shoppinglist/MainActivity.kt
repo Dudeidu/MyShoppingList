@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.text.InputType
+import android.util.Log
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
@@ -97,8 +98,6 @@ class MainActivity : AppCompatActivity(), StartDragListener {
         viewModel.itemList.observe(this, Observer { itemList ->
             recyclerAdapter.safeSubmitList(itemList)
         })
-
-
 
     }
 
