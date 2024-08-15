@@ -19,5 +19,7 @@
     <string name="type_default">Units</string>
     <string name="amount_default" translatable="false">1</string>
     <string name="icon_description">Item image</string>
+    <string name="settings">Settings</string>
+    <string name="about">About</string>
 
 </resources>

@@ -19,4 +19,6 @@
     <string name="enter_amount">כמות</string>
     <string name="type_default">יח\'</string>
     <string name="icon_description">תמונת הפריט</string>
+    <string name="settings">הגדרות</string>
+    <string name="about">אודות</string>
 </resources>

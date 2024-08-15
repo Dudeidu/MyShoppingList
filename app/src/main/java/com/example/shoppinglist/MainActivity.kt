@@ -1,12 +1,16 @@
 package com.example.shoppinglist
 
 import android.content.Context
+import android.content.res.Resources
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.inputmethod.InputMethodManager
 import android.widget.AutoCompleteTextView
+import android.widget.Toolbar
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -29,6 +33,7 @@ class MainActivity : AppCompatActivity(), StartDragListener {
     private lateinit var viewModel: ItemViewModel
     private lateinit var itemRepository: ItemRepository
     private lateinit var recyclerAdapter: RecyclerAdapter
+    private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private var fabAddItem: FloatingActionButton? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,6 +48,19 @@ class MainActivity : AppCompatActivity(), StartDragListener {
 
         itemRepository = ItemRepository(this)
         viewModel = ViewModelProvider(this, ViewModelFactory(itemRepository))[ItemViewModel::class.java]
+
+        // Find the toolbar in the layout and set it as the support action bar
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
+
+        // Optional: Customize the toolbar (e.g., add title, subtitle, etc.)
+        supportActionBar?.title = getString(R.string.app_name)
+
+
+
+
+        // Optional: Enable the Up button (if needed)
+        // supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = findViewById(R.id.recyclerView)
 
@@ -81,6 +99,25 @@ class MainActivity : AppCompatActivity(), StartDragListener {
             recyclerAdapter.safeSubmitList(itemList)
         })
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_main, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_settings -> {
+                // Handle settings click
+                true
+            }
+            R.id.action_about -> {
+                // Handle about click
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
     }
 
     private fun setAdapter() {

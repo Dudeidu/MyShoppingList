@@ -6,6 +6,7 @@ import android.widget.ArrayAdapter
 import android.widget.Filter
 import androidx.annotation.LayoutRes
 
+
 class CustomArrayAdapter(
     context: Context,
     @LayoutRes resource: Int,

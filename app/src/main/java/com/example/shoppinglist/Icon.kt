@@ -5,6 +5,7 @@ import java.util.ArrayList
 import java.util.Locale
 import kotlin.math.min
 
+
 data class Icon(
     val name: String,
     val tags: List<String>,
@@ -329,39 +330,30 @@ class IconSearcher {
 
     // Function to calculate relevance score
     fun calculateRelevanceScore(query: String, tags: List<String>): Int {
-        // Convert query to lowercase for case-insensitive comparison
         val queryLower = query.lowercase()
-
         var highestScore = 0
 
         for (tag in tags) {
-            // Convert tag to lowercase for case-insensitive comparison
             val tagLower = tag.lowercase()
 
-            // Check for exact match
-            if (queryLower == tagLower) {
-                return 100
+            // Exact match check
+            if (queryLower == tagLower) return 100
+
+            // Base score calculation using startsWith, contains, etc.
+            val baseScore = when {
+                tagLower.startsWith(queryLower) -> 50
+                queryLower.startsWith(tagLower) -> 40
+                tagLower.contains(queryLower) -> 30
+                queryLower.contains(tagLower) -> 20
+                else -> 0
             }
 
-            // Calculate matching characters for partial matches
-            val queryChars = queryLower.toSet()
-            val tagChars = tagLower.toSet()
-            val matchingChars = queryChars.intersect(tagChars).size
-            val totalQueryChars = queryChars.size
+            // Calculate additional score based on character matching
+            val matchingChars = queryLower.count { tagLower.contains(it) }
+            val additionalScore = (matchingChars.toDouble() / tagLower.length * 30).toInt()
 
-            // Base score for partial matches
-            val baseScore =
-                if (tagLower.contains(queryLower)) 50
-                else if (queryLower.contains(tagLower)) 30
-                else 0
-
-            // Calculate additional score based on the number of matching characters
-            val additionalScore = min(1.0, matchingChars.toDouble() / tagChars.size) * 50
-
-            val score = (baseScore + additionalScore).toInt()
-            if (score > highestScore) {
-                highestScore = score
-            }
+            val score = baseScore + additionalScore
+            if (score > highestScore) highestScore = score
         }
 
         return highestScore
@@ -373,13 +365,19 @@ class IconSearcher {
 
         for (item in icons) {
             val score = calculateRelevanceScore(query, item.tags)
+
             if (score == 100) {
+                Log.d("ITEM", "query: $query, score: exact match")
                 return item.resource
-            } else if (score > scoreThreshold && score > highestScore) {
+            }
+
+            if (score > scoreThreshold && score > highestScore) {
                 highestScore = score
                 bestMatch = item.resource
             }
         }
+
+        Log.d("ITEM", "query: $query, score: $highestScore")
         return bestMatch
     }
 }
