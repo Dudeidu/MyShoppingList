@@ -4,16 +4,9 @@ import android.content.Context
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.InputType
 import android.util.Log
-import android.view.View
-import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
-import android.widget.ArrayAdapter
 import android.widget.AutoCompleteTextView
-import android.widget.Button
-import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -25,7 +18,6 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.textfield.TextInputLayout
 
 
 class MainActivity : AppCompatActivity(), StartDragListener {
@@ -62,33 +54,23 @@ class MainActivity : AppCompatActivity(), StartDragListener {
                 // Scroll the RecyclerView to the top
                 recyclerView?.scrollToPosition(0)
             }
-            fabAddItem = findViewById(R.id.fabAddItem)
-            fabAddItem?.setOnClickListener { view ->
-                viewModel.addItem("")
 
-                recyclerView?.post {
-                    // Scroll the RecyclerView to the top
-                    recyclerView?.scrollToPosition(0)
+            // Use a Handler to delay the focus request
+            Handler(Looper.getMainLooper()).postDelayed({
+                // Get the ViewHolder at that position
+                val viewHolder = recyclerView?.findViewHolderForAdapterPosition(0)
 
-                    // Use a Handler to delay the focus request
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        // Get the ViewHolder at that position
-                        val viewHolder = recyclerView?.findViewHolderForAdapterPosition(0)
-
-                        // If the ViewHolder is found and not null
-                        if (viewHolder != null) {
-                            // Assuming your ViewHolder has an EditText field, get the EditText reference
-                            val actv = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.actvItemName)
-                            // Request focus on the EditText
-                            actv.requestFocus()
-                            // Show the keyboard
-                            val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                            imm.showSoftInput(actv, InputMethodManager.SHOW_IMPLICIT)
-                        }
-                    }, 300) // Adjust the delay as needed
+                // If the ViewHolder is found and not null
+                if (viewHolder != null) {
+                    // Assuming your ViewHolder has an EditText field, get the EditText reference
+                    val actv = viewHolder.itemView.findViewById<AutoCompleteTextView>(R.id.actvItemName)
+                    // Request focus on the EditText
+                    actv.requestFocus()
+                    // Show the keyboard
+                    val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+                    imm.showSoftInput(actv, InputMethodManager.SHOW_IMPLICIT)
                 }
-            }
-
+            }, 500) // Adjust the delay as needed
         }
 
         // Bind the adapter
@@ -124,35 +106,4 @@ class MainActivity : AppCompatActivity(), StartDragListener {
     override fun requestDrag(viewHolder: RecyclerView.ViewHolder) {
         itemTouchHelper.startDrag(viewHolder)
     }
-    /*
-    private fun addItem(name: String) {
-        // Find the index and the existing icon with the same name
-        val existingItemIndex = itemList.indexOfFirst { it.name == name }
-
-        var item: Item? = null
-        if (existingItemIndex == -1) {
-            // if item does not exist, create new
-            item = Item(name)
-        } else {
-            // if item exists, replace item with existing one
-            item = itemList[existingItemIndex]
-            itemList.removeAt(existingItemIndex)
-            recyclerView?.adapter?.notifyItemRemoved(existingItemIndex)
-        }
-
-        // Search Icon by name
-        item.iconResource = iconSearcher.findIconByQuery(name)
-
-        if (name == "") {
-            itemList.add(0, item)
-            recyclerView?.adapter?.notifyItemInserted(0)
-        } else {
-            itemList.add(item)
-            recyclerView?.adapter?.notifyItemInserted(itemList.size-1)
-        }
-
-    }
-    */
-
-
 }

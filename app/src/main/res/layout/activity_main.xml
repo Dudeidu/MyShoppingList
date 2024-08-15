@@ -30,7 +30,7 @@
         android:contentDescription="@string/add_item"
         android:focusable="true"
         android:src="@drawable/ic_plus"
-        app:backgroundTint="@color/material_dynamic_primary50"
+
         app:borderWidth="3dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

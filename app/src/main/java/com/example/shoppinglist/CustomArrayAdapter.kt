@@ -1,18 +1,10 @@
 package com.example.shoppinglist
 
-import android.R
 import android.content.Context
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Filter
-import android.widget.Filterable
-import android.widget.TextView
-import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
-import java.util.Locale
 
 class CustomArrayAdapter(
     context: Context,
@@ -21,13 +13,9 @@ class CustomArrayAdapter(
 )
     : ArrayAdapter<Any>(context, resource, items) {
 
-
     var tempItems: MutableList<Any> = mutableListOf()
     internal var suggestions: MutableList<Any> = mutableListOf()
 
-    /**
-     * Custom Filter implementation for custom suggestions we provide.
-     */
     private var filter: Filter = object : Filter() {
 
         override fun performFiltering(constraint: CharSequence?): FilterResults {
